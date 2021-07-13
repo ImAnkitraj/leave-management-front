@@ -1,3 +1,14 @@
+# Leave Management Portal
+
+### REQUIRED
+
+1. Nodejs
+
+### Steps to run
+
+* run npm install or npm i 
+* run npm start to start the react server
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
