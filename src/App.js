@@ -1,24 +1,45 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Switch, Route, Redirect} from "react-router-dom";
+import Apply from './pages/Apply/Apply';
+import Leave from './pages/Leave/Leave';
+import Auth from './pages/Auth/Auth';
+import Layout from './components/Layout/Layout';
+import { useDispatch, useSelector } from 'react-redux';
+import { login } from './store/auth/authActions';
+import { useCookies } from 'react-cookie';
 
 function App() {
+
+  const [ cookies, ] = useCookies( [ 'auth' ] );//using cookies
+  const dispatch = useDispatch(); //redux dispatch
+  const authState = useSelector( state => state.auth ); //auth redux state
+  
+  useEffect(()=>{
+
+    const token = cookies.token;
+    const userId = cookies.userId;
+
+    // after refresh
+    // if user is already logged in setting the redux state
+    // dispatching login action
+    // token and userId as argument
+    if( token && userId ){
+      dispatch(login(token, userId));
+    }
+
+  },[ dispatch, cookies.token, cookies.userId ])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Switch>
+        <Route path='/' exact>
+          { authState.token === ''? <Auth/> :<Redirect to='/leave' exact from='/' />}
+        </Route>
+        { authState?.token === '' ? <Redirect to='/' exact/> : <Route path='/leave' exact><Layout><Leave/></Layout></Route> }
+        { authState?.token === '' ? <Redirect to='/' exact/> : <Route path='/apply' exact><Layout><Apply/></Layout></Route> }
+        { authState?.token === '' ? <Redirect to='/' from='*'/>:<Redirect to='/leave' from='*' /> }
+      </Switch>
+    </Router>
   );
 }
 
